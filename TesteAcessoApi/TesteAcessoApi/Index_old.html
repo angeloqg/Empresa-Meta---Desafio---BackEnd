@@ -1,0 +1,43 @@
+﻿<!DOCTYPE html>
+<html ng-app="MyApp">
+<head>
+    <title></title>
+	<meta charset="utf-8" />
+    <link href="Content/bootstrap.css" rel="stylesheet" />
+
+    <script src="Scripts/jquery-1.9.1.js"></script>
+    <script src="Scripts/bootstrap.js"></script>
+    <script src="Scripts/angular.js"></script>
+    <script src="AngularApp/AppJs.js"></script>
+</head>
+<body ng-controller="MyCtrl">
+    <div class="container">
+        <h3>Teste WebService</h3>
+       <table class="table">
+           <tr>
+               <th>Id</th>
+               <th>Nome</th>
+               <th>Valor</th>
+               <th>Canal</th>
+               <th>Obs</th>
+           </tr>
+           <tr ng-repeat="dado in resultado">
+               <td>{{dado.idContato}}</td>
+               <td>{{dado.nome}}</td>
+               <td>{{dado.valor}}</td>
+               <td>{{dado.canal}}</td>
+               <td>{{dado.obs}}</td>
+           </tr>
+       </table>
+        {{valor}}
+       <h3>Retorno de Dados</h3>
+        <ul>
+            <li><strong>Id: </strong>{{valor.idContato}}</li>
+            <li><strong>Nome: </strong>{{valor.nome}}</li>
+            <li><strong>valor: </strong>{{valor.valor}}</li>
+            <li><strong>canal: </strong>{{valor.canal}}</li>
+            <li><strong>canal: </strong>{{valor.obs}}</li>
+        </ul>
+    </div>
+</body>
+</html>

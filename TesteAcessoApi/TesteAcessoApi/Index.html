@@ -1,0 +1,195 @@
+﻿<!DOCTYPE html>
+<html ng-app="MyApp">
+<head>
+    <title>Teste Web.API</title>
+    <meta charset="utf-8" />
+    <link href="Content/bootstrap.css" rel="stylesheet" />
+    <script src="Scripts/jquery-1.9.1.js"></script>
+    <script src="Scripts/bootstrap.js"></script>
+    <script src="Scripts/angular.js"></script>
+    <script src="AngularApp/AppJs.js"></script>
+</head>
+<body ng-controller="MyCtrl">
+    <div class="container">
+        <div class="alert alert-info text-center" style="margin-top:20px;height:50px">
+            <h2 style="margin-top:-8px">Testando a Web.API</h2>
+        </div>
+        <h3>Retorno de dados GET() / Exclusão de dados DELETE()</h3>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div style="margin-top:5px"><strong>Filtragem de paginação e quantidade de registros</strong></div>
+                    </div>
+                    <div class="col-sm-8">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <label for="id" class="col-sm-2 control-label" style="margin-top:5px">Página: </label>
+                                    <input type="number" min="0" max="999" value="0" id="pagina" class="form-control col-sm-2" style="width:70px;margin-left:40px"/>
+                                </div>
+                            </div>
+                            <div class="col-sm-3" style="margin-left:-40px">
+                                <div class="form-group">
+                                    <label for="tamanho" class="col-sm-2 control-label" style="margin-top:5px">Tamanho: </label>
+                                    <input type="number" min="0" max="999" value="0" id="tamanho" class="form-control col-sm-2" style="width:70px;margin-left:55px" />
+                                </div>
+                            </div>
+                            <div class="col-sm-2" style="width:300px">
+                                <button class="btn btn-primary" ng-click="filtrar()"><span class="glyphicon glyphicon-filter" style="margin-right:10px"></span>Filtar Dados</button>
+                                <button class="btn btn-info" ng-click="limparFiltro()"><span class="glyphicon glyphicon-remove" style="margin-right:10px"></span>Limpar Filtros</button>
+                            </div>
+                        </div>                    
+                    </div>
+                </div>            
+            </div>
+            <div class="panel-body">
+                <div style="overflow:auto;height:180px">
+                    <table class="table">
+                        <thead class="thead-default">
+                            <tr>
+                                <th class="text-center" style="width:40px">ID</th>
+                                <th class="text-center">Nome</th>
+                                <th class="text-center">Canal</th>
+                                <th class="text-center">Valor</th>
+                                <th class="text-center">Observação</th>
+                                <th class="text-center" style="width:200px">Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="obj in resultado">
+                                <th scope="row" class="text-center">{{obj.idContato}}</th>
+                                <td class="text-center">{{obj.nome}}</td>
+                                <td class="text-center">{{obj.canal}}</td>
+                                <td class="text-center">{{obj.valor}}</td>
+                                <td class="text-center">{{obj.obs}}</td>
+                                <td class="text-center">
+                                    <button class="btn btn-warning" ng-click="editar(obj)"><span class="glyphicon glyphicon-pencil" style="margin-right:10px"></span>Editar</button>
+                                    <button class="btn btn-danger" ng-disabled="excluir" ng-click="avisoExclusao(obj)"><span class="glyphicon glyphicon-trash" style="margin-right:10px"></span>Excluir</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>           
+        </div>
+        
+        <h3>Alteração de dados POST() / UPDATE()</h3>
+
+        <div class="panel panel-info">
+            <div class="panel-heading"><strong>Dados do Registro</strong></div>
+            <div class="panel-body">
+                <form name="validacao">
+                    <div class="row">
+                        <div class="col-sm-3">
+                            <label for="nome">Nome</label>
+                            <input type="text" class="form-control" id="nome" ng-model="nome" required>
+                        </div>
+                        <div class="col-sm-3">
+                            <label for="canal">Canal</label>
+                            <input type="text" class="form-control" id="canal" ng-model="canal" required>
+                        </div>
+                        <div class="col-sm-3">
+                            <label for="valor">Valor</label>
+                            <input type="text" class="form-control" id="valor" ng-model="valor" required>
+                        </div>
+                        <div class="col-sm-3">
+                            <label for="obs">Observação</label>
+                            <input type="text" class="form-control" id="obs">
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top:10px">
+                        <div class="col-sm-12 text-right">
+                            <a class="btn btn-success" ng-if="!exibir" ng-disabled="!validacao.$valid" ng-click="executarInclusao()"><span class="glyphicon glyphicon-plus" style="margin-right:10px"></span>Incluir</a>
+                            <a class="btn btn-primary" ng-if="exibir" ng-disabled="!validacao.$valid" ng-click="avisoAlteracao()"><span class="glyphicon glyphicon-asterisk" style="margin-right:10px"></span>Alterar</a>
+                            <a class="btn btn-info" ng-click="cancelar()"><span class="glyphicon glyphicon-off" style="margin-right:10px"></span>Cancelar</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="popupAviso" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header" ng-style="estilo">
+                    <div class="row">
+                        <div class="col-sm-6 text-left">
+                            
+                            <h5 class="modal-title" id="titulo" style="color:white">
+                                <strong>
+                                    <span ng-if="exibir" span class="glyphicon glyphicon-pencil" style="margin-right:10px;color:white"></span><span ng-if="exibir">ALTERAR REGISTRO</span>
+                                </strong>
+                                <strong>
+                                    <span ng-if="!exibir" span class="glyphicon glyphicon-trash" style="margin-right:10px;color:white"></span><span ng-if="!exibir">EXCLUIR REGISTRO</span>
+                                </strong>
+                            </h5>
+                        </div>
+                        <div class="col-sm-6 text-right">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <h4>
+                        <span ng-if="exibir">
+                            <strong>
+                                Deseja realizar a alteração do registro?
+                            </strong>
+                        </span>
+                        <span ng-if="!exibir">
+                            <strong>
+                                Deseja realizar a exclusão do registro?
+                            </strong>
+                        </span>
+                    </h4>                        
+                </div>
+                <div class="modal-footer">
+                    <button type="button" ng-if="exibir" class="btn btn-warning" data-dismiss="modal"  ng-click="executarAlteracao()">Alterar Registro</button>
+                    <button type="button" ng-if="!exibir" class="btn btn-danger" data-dismiss="modal" ng-click="executarExclusao()">Excluir Registro</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Sair</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="popupMensagem" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header" ng-style="estiloMensagem">
+                    <div class="row">
+                        <div class="col-sm-6 text-left">
+
+                            <h5 class="modal-title" id="titulo" style="color:white">
+                                <strong>
+                                    <span ng-if="status" span class="glyphicon glyphicon-ok" style="margin-right:10px;color:white"></span><span ng-if="status">SUCESSO</span>
+                                </strong>
+                                <strong>
+                                    <span ng-if="!status" span class="glyphicon glyphicon-remove" style="margin-right:10px;color:white"></span><span ng-if="!status">ERRO</span>
+                                </strong>
+                            </h5>
+                        </div>
+                        <div class="col-sm-6 text-right">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <h4>
+                        <strong><span id="mensagem"></span></strong>                    
+                    </h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Sair</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
